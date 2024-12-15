@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import * as ContractData from "../../../../hardhat/artifacts/contracts/Game.sol/Game.json";
+import * as ContractData from "../../../public/Game.json";
 import { encodePacked, formatEther, keccak256 } from "viem";
 import { useReadContract, useWriteContract } from "wagmi";
 import CommitStage from "~~/app/_Components/CommitStage";
@@ -51,10 +51,10 @@ function Page({ params }: { params: { ContractAddress: string } }) {
 
   // Extracting values from the player1 query
   const { isLoading: isPlayer1Loading, isError: isPlayer1Error, error: player1Error } = player1Query;
-  const player1 = player1Query.data as Player;
+  const player1 = (player1Query.data as Player) || ["", "", 0];
   // Extracting values from the player2 query
   const { isLoading: isPlayer2Loading, isError: isPlayer2Error, error: player2Error } = player2Query;
-  const player2 = player2Query.data as Player;
+  const player2 = (player2Query.data as Player) || ["", "", 0];
 
   const commitMove = async (move: Moves, secret: string) => {
     if (!ContractAddress) {

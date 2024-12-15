@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import * as ContractData from "../../hardhat/artifacts/contracts/Game.sol/Game.json";
+import * as ContractData from "../public/Game.json";
 import DeployStage from "./_Components/DeployStage";
 import { parseEther } from "viem";
 import { useAccount, useWalletClient } from "wagmi";
