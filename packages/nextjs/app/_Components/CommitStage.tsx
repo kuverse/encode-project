@@ -20,9 +20,6 @@ const CommitStage: React.FC<{
 
   const generateRandomSecret = () => Math.random().toString(36).substring(2, 15);
   const { address } = useAccount();
-  console.log(address);
-  console.log(player1);
-  console.log(player2);
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4 text-black">Commit Your Move</h2>

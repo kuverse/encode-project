@@ -11,7 +11,11 @@ const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
     <html suppressHydrationWarning>
       <body>
         <ThemeProvider enableSystem>
-          <ScaffoldEthAppWithProviders>{children}</ScaffoldEthAppWithProviders>
+          <ScaffoldEthAppWithProviders>
+            <div className="flex justify-center items-center">
+              <div className="w-10/12">{children}</div>
+            </div>
+          </ScaffoldEthAppWithProviders>
         </ThemeProvider>
       </body>
     </html>

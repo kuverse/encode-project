@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import * as ContractData from "../../public/Game.json";
+import ContractData from "../../public/Game.json";
 import { useWriteContract } from "wagmi";
 
 enum Moves {

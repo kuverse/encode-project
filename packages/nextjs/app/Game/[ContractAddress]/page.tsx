@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import * as ContractData from "../../../public/Game.json";
+import ContractData from "../../../public/Game.json";
 import { encodePacked, formatEther, keccak256 } from "viem";
 import { useReadContract, useWriteContract } from "wagmi";
 import CommitStage from "~~/app/_Components/CommitStage";
