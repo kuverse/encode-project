@@ -1,11 +1,12 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import ContractData from "../../../public/Game.json";
 import { encodePacked, formatEther, keccak256 } from "viem";
 import { useReadContract, useWriteContract } from "wagmi";
 import CommitStage from "~~/app/_Components/CommitStage";
 import RevealStage from "~~/app/_Components/RevealStage";
+import Image from "next/image";
 
 enum Moves {
   Rock = 1,
@@ -18,6 +19,22 @@ type Player = [string, string, number];
 function Page({ params }: { params: { ContractAddress: string } }) {
   const ContractAddress = params.ContractAddress;
   const { writeContract } = useWriteContract();
+  const [gameAddresses, setGameAddresses] = useState<string[]>([]);
+  const [move, setMove] = useState<Moves | null>(null);
+  const [secret, setSecret] = useState<string>("");
+
+  useEffect(() => {
+    const savedMove = localStorage.getItem("move");
+    const savedSecret = localStorage.getItem("secret");
+  
+    if (savedMove) {
+      setMove(JSON.parse(savedMove));
+    }
+    if (savedSecret) {
+      setSecret(savedSecret);
+    }
+  }, []);
+  
 
   const betAmountQuery = useReadContract({
     abi: ContractData.abi,
@@ -46,13 +63,9 @@ function Page({ params }: { params: { ContractAddress: string } }) {
   });
 
   const { data: winner, isLoading: isWinnerLoading, isError: isWinnerError, error: winnerError } = winnerQuery;
-  // Extracting values from the bet amount query
   const { data: betAmount, isLoading: isBetLoading, isError: isBetError, error: betError } = betAmountQuery;
-
-  // Extracting values from the player1 query
   const { isLoading: isPlayer1Loading, isError: isPlayer1Error, error: player1Error } = player1Query;
   const player1 = (player1Query.data as Player) || ["", "", 0];
-  // Extracting values from the player2 query
   const { isLoading: isPlayer2Loading, isError: isPlayer2Error, error: player2Error } = player2Query;
   const player2 = (player2Query.data as Player) || ["", "", 0];
 
@@ -61,8 +74,13 @@ function Page({ params }: { params: { ContractAddress: string } }) {
       alert("Contract address not set. Please deploy the contract first.");
       return;
     }
-
     try {
+      setMove(move);
+      setSecret(secret);
+
+      localStorage.setItem("move", JSON.stringify(move));
+      localStorage.setItem("secret", secret);
+
       console.log(move, secret);
       const encoded = encodePacked(["uint8", "string"], [move, secret]);
       const commitHash = keccak256(encoded);
@@ -80,17 +98,19 @@ function Page({ params }: { params: { ContractAddress: string } }) {
       alert("Failed to commit move.");
     }
   };
+
   const renderWinnerInfo = () => {
     if (isWinnerLoading) return <p>Loading winner...</p>;
     if (isWinnerError) return <p>Error fetching winner: {winnerError?.message}</p>;
 
     // Assuming the winner is returned as an address or a specific identifier
     if (winner === "0x0000000000000000000000000000000000000000") {
-      return <p>It`&apos;`s a draw!</p>;
+      return <p className="text-lg text-black">Draw! Try again.</p>;
     } else if (winner) {
       return (
-        <p>
+        <p className="text-lg text-black">
           Winner: {winner as ReactNode} Congrats on the {formatEther(betAmount as bigint)} ETH
+          Move and secret: {move}{secret}
         </p>
       );
     }
@@ -98,54 +118,155 @@ function Page({ params }: { params: { ContractAddress: string } }) {
     return null;
   };
   return (
-    <div>
+    <div className="p-6 space-y-6 max-w-4xl mx-auto bg-white">
+      {/* Logo */}
+      <div className="flex justify-center mb-6">
+        <Image
+          src="/images/rps-logo.png"
+          width={400}
+          height={400}
+          alt="Rock Paper Scissors"
+          className="mx-auto"
+        />
+      </div>
+     
+      {/* Bet Amount */}
       {isBetLoading ? (
         <p>Loading bet amount...</p>
       ) : isBetError ? (
         <p>Error fetching bet amount: {betError.message}</p>
       ) : (
-        <p>Bet Amount: {formatEther(betAmount as bigint)?.toString()} ETH</p>
+        <p className="text-xl bg-green-500 font-bold text-center">
+          Bet Amount: {formatEther(betAmount as bigint)?.toString()} ETH
+        </p>
       )}
-
-      {isPlayer1Loading ? (
-        <p>Loading player 1...</p>
-      ) : isPlayer1Error ? (
-        <p>Error fetching player 1: {player1Error.message}</p>
-      ) : (
-        <div>
-          <p>Player 1 Address: {player1[0]}</p>
-          <p>Player 1 commitment: {player1[1]}</p>
-          <p>Player 1 reveal: {player1[2] != 0 ? "true" : "false"}</p>
-        </div>
-      )}
-
-      {isPlayer2Loading ? (
-        <p>Loading player 2...</p>
-      ) : isPlayer2Error ? (
-        <p>Error fetching player 2: {player2Error.message}</p>
-      ) : (
-        <div>
-          <p>Player 2 Address: {player2[0]}</p>
-          <p>Player 2 commitment: {player2[1]}</p>
-          <p>Player 2 reveal: {player2[2] != 0 ? "true" : "false"}</p>
-          {player1[1] == "0x0000000000000000000000000000000000000000000000000000000000000000" ||
-          player2[1] == "0x0000000000000000000000000000000000000000000000000000000000000000" ? (
-            <div>
-              <CommitStage onCommit={commitMove} player1={player1} player2={player2} />
+  
+      {/* Player Cards */}
+      <div className="flex flex-col lg:flex-row gap-6 items-center justify-center">
+        {/* Player 1 Card */}
+        {isPlayer1Loading ? (
+          <p>Loading Player 1...</p>
+        ) : isPlayer1Error ? (
+          <p>Error fetching Player 1: {player1Error.message}</p>
+        ) : (
+          <div className="bg-white p-4 rounded-lg shadow-lg space-y-4 w-300 lg:w-1/2">
+            {/* Player 1 Header */}
+            <div className="flex items-center space-x-4">
+              <img
+                src="/images/girl.webp"
+                alt="Player 1"
+                className="w-16 h-16 object-cover rounded-full"
+              />
+              <div>
+                <h2 className="text-xl font-bold text-gray-800">Player 1:</h2>
+                <h3 className="text-lg font-bold text-gray-800">
+                  {`${player1[0].slice(0, 6)}...${player1[0].slice(-8)}`}
+                </h3>
+              </div>
             </div>
+  
+            {/* Player 1 Info */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 border rounded-lg flex items-center justify-between">
+                <span className="font-medium text-gray-600">Commitment</span>
+                <input
+                  type="checkbox"
+                  readOnly
+                  checked={
+                    player1[1] !==
+                    "0x0000000000000000000000000000000000000000000000000000000000000000"
+                  }
+                />
+              </div>
+              <div className="p-4 border rounded-lg flex items-center justify-between">
+                <span className="font-medium text-gray-600">Reveal</span>
+                <input
+                  type="checkbox"
+                  readOnly
+                  checked={player1[2] !== 0}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+  
+        {/* Player 2 Card */}
+        {isPlayer2Loading ? (
+          <p>Loading Player 2...</p>
+        ) : isPlayer2Error ? (
+          <p>Error fetching Player 2: {player2Error.message}</p>
+        ) : (
+          <div className="bg-white p-4 rounded-lg shadow-lg space-y-4 w-300 lg:w-1/2">
+            {/* Player 2 Header */}
+            <div className="flex items-center space-x-4">
+              <img
+                src="/images/boy.webp"
+                alt="Player 2"
+                className="w-16 h-16 object-cover rounded-full"
+              />
+              <div>
+                <h2 className="text-xl font-bold text-gray-800">Player 2:</h2>
+                <h3 className="text-lg font-bold text-gray-800">
+                  {`${player2[0].slice(0, 6)}...${player2[0].slice(-8)}`}
+                </h3>
+              </div>
+            </div>
+  
+            {/* Player 2 Info */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 border rounded-lg flex items-center justify-between">
+                <span className="font-medium text-gray-600">Commitment</span>
+                <input
+                  type="checkbox"
+                  readOnly
+                  checked={
+                    player2[1] !==
+                    "0x0000000000000000000000000000000000000000000000000000000000000000"
+                  }
+                />
+              </div>
+              <div className="p-4 border rounded-lg flex items-center justify-between">
+                <span className="font-medium text-gray-600">Reveal</span>
+                <input
+                  type="checkbox"
+                  readOnly
+                  checked={player2[2] !== 0}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+  
+      {/* Commit or Reveal Stage */}
+      {player1[1] === "0x0000000000000000000000000000000000000000000000000000000000000000" ||
+      player2[1] === "0x0000000000000000000000000000000000000000000000000000000000000000" ? (
+        <CommitStage onCommit={commitMove} player1={player1} player2={player2} />
+      ) : (
+        <div>
+          {player2[2] !== 0 && player1[2] !== 0 ? (
+            renderWinnerInfo()
           ) : (
-            <div>
-              {player2[2] != 0 && player1[2] != 0 ? (
-                renderWinnerInfo()
-              ) : (
-                <RevealStage contractAddress={ContractAddress} />
-              )}
-            </div>
+          <RevealStage 
+            contractAddress={ContractAddress} 
+            move={move as Moves} 
+            secret={secret} 
+          />            
+             
           )}
         </div>
       )}
+       <p className="font-medium text-gray-600">
+        Move: {move ? Moves[move] : "Waiting for move..."}
+      </p>
+      <p className="font-medium text-gray-600">
+        Secret: {secret || "Waiting for secret..."}
+      </p>
     </div>
   );
+  
+  
+  
 }
 
 export default Page;

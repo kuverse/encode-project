@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useAccount } from "wagmi";
+import Image from "next/image";
 
 // Enum for moves
 enum Moves {
@@ -9,12 +10,21 @@ enum Moves {
   Paper = 2,
   Scissors = 3,
 }
+
+const moveImages = {
+  [Moves.Rock]: "/images/rock.png", // Replace with the actual path to your rock image
+  [Moves.Paper]: "/images/paper.png", // Replace with the actual path to your paper image
+  [Moves.Scissors]: "/images/scissors.png", // Replace with the actual path to your scissors image
+};
+
 type Player = [string, string, number];
+
 const CommitStage: React.FC<{
   player1: Player;
   player2: Player;
   onCommit: (move: Moves, secret: string) => void;
 }> = ({ onCommit, player1, player2 }) => {
+
   const [selectedMove, setSelectedMove] = useState<Moves | null>(null);
   const [secret, setSecret] = useState<string>("");
 
@@ -30,11 +40,17 @@ const CommitStage: React.FC<{
             <button
               key={move}
               onClick={() => setSelectedMove(move as Moves)}
-              className={`p-4 rounded ${
+              className={`py-2 rounded flex items-center justify-center ${
                 selectedMove === move ? "bg-blue-500 " : "bg-gray-200 text-gray-700 hover:bg-gray-300"
               }`}
             >
-              {Moves[move as Moves]}
+               <Image
+                  src={moveImages[move as Moves]}
+                  alt={Moves[move as Moves]}
+                  width={50}
+                  height={50}
+                  className="mb-2"
+                />
             </button>
           ))}
       </div>
