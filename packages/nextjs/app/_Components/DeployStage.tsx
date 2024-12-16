@@ -31,7 +31,7 @@ const DeployStage: React.FC<DeployStageProps> = ({
       <div className="flex items-center justify-end">
       <InfoPopup />
           </div>
-          <Image src="/images/rps-logo.png" width={400} height={400} alt="Rock Paper Scissors" className="mx-auto" />
+          <Image src="/images/logo-rps.png" width={600} height={600} alt="Rock Paper Scissors" className="mx-auto" />
         </div>
      
 
@@ -63,7 +63,7 @@ const DeployStage: React.FC<DeployStageProps> = ({
           }`}
           disabled={!isRivalAddressValid}
         >
-        Start Game        
+        Start New Game        
         </button>
       </div>
     </div>

@@ -75,10 +75,10 @@ const RockPaperScissorsGame: React.FC = () => {
           onDeploy={deployContract}
         />
 
-
-        <div className="max-h-md p-6 bg-white rounded-lg shadow-md mt-6">
+        <h3 className="p-6">OR</h3>
+        <div className="w-200 h-44 p-6 bg-white rounded-lg shadow-md " style={{ width: "400px" }}>
           <h4 className="text-l font-bold text-black">Already have a game started?</h4>
-          <div className="w-96">
+          <div className="w-70">
             <input
               type="text"
               value={inputAddress}
@@ -91,7 +91,7 @@ const RockPaperScissorsGame: React.FC = () => {
 
           <button
             onClick={handleNavigate}
-            className={`w-full p-2 rounded ${isAddressValid ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400"}`}
+            className={`w-full p-3 rounded ${isAddressValid ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400"}`}
             disabled={!isAddressValid}
           >
             Go to Game

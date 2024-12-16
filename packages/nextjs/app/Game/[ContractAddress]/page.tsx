@@ -168,7 +168,7 @@ function Page({ params }: { params: { ContractAddress: string } }) {
             {/* Player 1 Info */}
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 border rounded-lg flex items-center justify-between">
-                <span className="font-medium text-gray-600">Commitment</span>
+                <span className="font-medium text-gray-600">Move Chosen</span>
                 <input
                   type="checkbox"
                   readOnly
@@ -179,7 +179,7 @@ function Page({ params }: { params: { ContractAddress: string } }) {
                 />
               </div>
               <div className="p-4 border rounded-lg flex items-center justify-between">
-                <span className="font-medium text-gray-600">Reveal</span>
+                <span className="font-medium text-gray-600">Revealed</span>
                 <input
                   type="checkbox"
                   readOnly
@@ -215,7 +215,7 @@ function Page({ params }: { params: { ContractAddress: string } }) {
             {/* Player 2 Info */}
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 border rounded-lg flex items-center justify-between">
-                <span className="font-medium text-gray-600">Commitment</span>
+                <span className="font-medium text-gray-600">Move Chosen</span>
                 <input
                   type="checkbox"
                   readOnly
@@ -226,7 +226,7 @@ function Page({ params }: { params: { ContractAddress: string } }) {
                 />
               </div>
               <div className="p-4 border rounded-lg flex items-center justify-between">
-                <span className="font-medium text-gray-600">Reveal</span>
+                <span className="font-medium text-gray-600">Revealed</span>
                 <input
                   type="checkbox"
                   readOnly
