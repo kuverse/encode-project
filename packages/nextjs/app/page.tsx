@@ -76,7 +76,7 @@ const RockPaperScissorsGame: React.FC = () => {
         />
 
         <h3 className="p-6">OR</h3>
-        <div className="w-200 h-44 p-6 bg-white rounded-lg shadow-md " style={{ width: "400px" }}>
+        <div className="w-200 h-55 p-6 bg-white rounded-lg shadow-md " style={{ width: "400px" }}>
           <h4 className="text-l font-bold text-black">Already have a game started?</h4>
           <div className="w-70">
             <input
