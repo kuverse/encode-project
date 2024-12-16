@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ContractData from "../../../public/Game.json";
 import { encodePacked, formatEther, keccak256 } from "viem";
 import { useReadContract, useWriteContract } from "wagmi";
@@ -143,6 +143,8 @@ function Page({ params }: { params: { ContractAddress: string } }) {
     }
   };
 
+
+
   const renderWinnerInfo = (playerMove: Moves | null) => {
     
     if (isWinnerLoading) return <p>Loading winner...</p>;
@@ -210,7 +212,7 @@ function Page({ params }: { params: { ContractAddress: string } }) {
     return (
 
       <div className="text-center shadow-lg rounded-lg w-300 lg:w-1/2">
-        <p className="text-lg font-bold text-black">
+        <p className="text-lg font-bold text-black mt-20">
           {isUserWinner ? "🎉 You Won! 🎉" : "😢 You Lost! 😢"}
         </p>
         <p className={`text-lg ${isUserWinner ? "text-green-500" : "text-red-500"}`}>
