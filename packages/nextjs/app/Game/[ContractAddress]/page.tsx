@@ -7,33 +7,40 @@ import { useReadContract, useWriteContract } from "wagmi";
 import CommitStage from "~~/app/_Components/CommitStage";
 import RevealStage from "~~/app/_Components/RevealStage";
 import Image from "next/image";
+import { useAccount } from "wagmi";
 
 enum Moves {
   Rock = 1,
   Paper = 2,
   Scissors = 3,
 }
-
+const moveImages = {
+  [Moves.Rock]: "/images/rock.png", // Replace with the actual path to your rock image
+  [Moves.Paper]: "/images/paper.png", // Replace with the actual path to your paper image
+  [Moves.Scissors]: "/images/scissors.png", // Replace with the actual path to your scissors image
+};
 type Player = [string, string, number];
 
 function Page({ params }: { params: { ContractAddress: string } }) {
   const ContractAddress = params.ContractAddress;
   const { writeContract } = useWriteContract();
-  const [gameAddresses, setGameAddresses] = useState<string[]>([]);
   const [move, setMove] = useState<Moves | null>(null);
   const [secret, setSecret] = useState<string>("");
+  const address = useAccount();
 
   useEffect(() => {
-    const savedMove = localStorage.getItem("move");
-    const savedSecret = localStorage.getItem("secret");
+    if (!address) return; // Ensure the address is available before fetching
+    const savedMove = localStorage.getItem(`player_${address.address}_move`);
+    const savedSecret = localStorage.getItem(`player_${address.address}_secret`);
   
     if (savedMove) {
-      setMove(JSON.parse(savedMove));
+      setMove(JSON.parse(savedMove)); // Set the move variable for the current player
     }
     if (savedSecret) {
-      setSecret(savedSecret);
+      setSecret(savedSecret); // Set the secret variable for the current player
     }
-  }, []);
+  }, [address]); // React to changes in the player address
+  
   
 
   const betAmountQuery = useReadContract({
@@ -61,9 +68,25 @@ function Page({ params }: { params: { ContractAddress: string } }) {
     address: ContractAddress,
     functionName: "viewWinner",
   });
+  const GameQuery = useReadContract({
+    abi: ContractData.abi,
+    address: ContractAddress,
+    functionName: "gameState",
+  });
+  const ForfeitQuery = useReadContract({
+    abi: ContractData.abi,
+    address: ContractAddress,
+    functionName: "surrender",
+  });
+
+  const { data: forfeiter, isLoading: isForfeitLoading } = ForfeitQuery;
+  console.log(forfeiter);
+  
+  const { data: State, isLoading: isStateLoading, isError: isStateError, error: StateError } = GameQuery;
 
   const { data: winner, isLoading: isWinnerLoading, isError: isWinnerError, error: winnerError } = winnerQuery;
   const { data: betAmount, isLoading: isBetLoading, isError: isBetError, error: betError } = betAmountQuery;
+  
   const { isLoading: isPlayer1Loading, isError: isPlayer1Error, error: player1Error } = player1Query;
   const player1 = (player1Query.data as Player) || ["", "", 0];
   const { isLoading: isPlayer2Loading, isError: isPlayer2Error, error: player2Error } = player2Query;
@@ -78,8 +101,15 @@ function Page({ params }: { params: { ContractAddress: string } }) {
       setMove(move);
       setSecret(secret);
 
-      localStorage.setItem("move", JSON.stringify(move));
-      localStorage.setItem("secret", secret);
+      localStorage.setItem(
+        `player_${address.address}_move`,
+        JSON.stringify(move)
+      );
+      localStorage.setItem(
+        `player_${address.address}_secret`,
+        secret
+      );
+      
 
       console.log(move, secret);
       const encoded = encodePacked(["uint8", "string"], [move, secret]);
@@ -99,24 +129,134 @@ function Page({ params }: { params: { ContractAddress: string } }) {
     }
   };
 
-  const renderWinnerInfo = () => {
+  const surrender = () => {
+    try {
+      writeContract({
+        abi: ContractData.abi,
+        address: ContractAddress,
+        functionName: "forfeit",
+        args: [],
+      });
+    } catch (error) {
+      console.error("Error Surrendering:", error);
+      alert("Failed to Surrender.");
+    }
+  };
+
+  const renderWinnerInfo = (playerMove: Moves | null) => {
+    
     if (isWinnerLoading) return <p>Loading winner...</p>;
     if (isWinnerError) return <p>Error fetching winner: {winnerError?.message}</p>;
-
-    // Assuming the winner is returned as an address or a specific identifier
+  
+    // Check if the game resulted in a draw
     if (winner === "0x0000000000000000000000000000000000000000") {
-      return <p className="text-lg text-black">Draw! Try again.</p>;
-    } else if (winner) {
       return (
-        <p className="text-lg text-black">
-          Winner: {winner as ReactNode} Congrats on the {formatEther(betAmount as bigint)} ETH
-          Move and secret: {move}{secret}
-        </p>
+        <div className="text-center">
+          <p className="text-lg font-bold text-black">🤝 It's a Draw! Try again.</p>
+          <div className="flex justify-center items-center gap-4 mt-4">
+            <div>
+              <p className="font-medium text-gray-700">Your Move</p>
+              <Image
+                src={moveImages[playerMove!]}
+                alt={Moves[playerMove!]}
+                width={50}
+                height={50}
+                className="wiggle"
+              />
+              <p>{Moves[playerMove!]}</p>
+            </div>
+            <div>
+              <p className="font-medium text-gray-700">Opponent's Move</p>
+              <Image
+                src={moveImages[playerMove!]}
+                alt={Moves[playerMove!]}
+                width={50}
+                height={50}
+                className="wiggle"
+              />
+              <p>{Moves[playerMove!]}</p>
+            </div>
+          </div>
+        </div>
       );
     }
+  
+    // Check if the user won
+    const isUserWinner =
+    typeof winner === "string" &&
+    typeof address?.address === "string" &&
+    address.address.toLowerCase().trim() === winner.toLowerCase().trim();  
+    // Calculate opponent's move based on the result
+    const calculateOpponentMove = (myMove: Moves, won: boolean): Moves => {
+      if (won) {
+        // If the user won, the opponent had a move that loses to the player's move
+        return myMove === Moves.Rock
+          ? Moves.Scissors
+          : myMove === Moves.Paper
+          ? Moves.Rock
+          : Moves.Paper;
+      } else {
+        // If the user lost, the opponent had a move that beats the player's move
+        return myMove === Moves.Rock
+          ? Moves.Paper
+          : myMove === Moves.Paper
+          ? Moves.Scissors
+          : Moves.Rock;
+      }
+    };
+  
+    const opponentMove = calculateOpponentMove(playerMove!, isUserWinner);
+  
+    return (
 
-    return null;
+      <div className="text-center shadow-lg rounded-lg w-300 lg:w-1/2">
+        <p className="text-lg font-bold text-black">
+          {isUserWinner ? "🎉 You Won! 🎉" : "😢 You Lost! 😢"}
+        </p>
+        <p className={`text-lg ${isUserWinner ? "text-green-500" : "text-red-500"}`}>
+          {isUserWinner
+            ? `Congrats! You won ${formatEther(betAmount as bigint)} ETH`
+            : `Better luck next time! The winner won ${formatEther(betAmount as bigint)} ETH`}
+        </p>
+        <div className="flex justify-center items-center gap-8 mt-4">
+          <div>
+            <p className="font-medium text-gray-700">Your Move</p>
+            <Image
+              src={moveImages[playerMove!]}
+              alt={Moves[playerMove!]}
+              width={100}
+              height={100}
+              className="wiggle"
+            />
+            <p>{Moves[playerMove!]}</p>
+          </div>
+          <div>
+            <p className="font-medium text-gray-700">Opponent's Move</p>
+            <Image
+              src={moveImages[opponentMove]}
+              alt={Moves[opponentMove]}
+              width={100}
+              height={100}
+              className="wiggle"
+            />
+            <p>{Moves[opponentMove]}</p>
+          </div>
+        </div>
+
+
+        <button
+          onClick={() => (window.location.href = "/")}
+          className="px-10 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 mb-5"
+        >
+          Restart
+        </button>
+      </div>
+    );
   };
+  
+  
+
+
   return (
     <div className="p-6 space-y-6 max-w-4xl mx-auto bg-white">
       {/* Logo */}
@@ -136,9 +276,19 @@ function Page({ params }: { params: { ContractAddress: string } }) {
       ) : isBetError ? (
         <p>Error fetching bet amount: {betError.message}</p>
       ) : (
-        <p className="text-xl bg-green-500 font-bold text-center">
+        <div className="text-center flex items-center justify-center gap-2">
+        <p className="text-2xl p-2 bg-blue-400 font-bold inline-block text-center">
           Bet Amount: {formatEther(betAmount as bigint)?.toString()} ETH
         </p>
+        <Image
+          src="/images/eth.png" // Replace with the actual path to your Ethereum logo
+          alt="Ethereum"
+          width={20}
+          height={20}
+          className="wiggle"
+        />
+      </div>
+
       )}
   
       {/* Player Cards */}
@@ -157,12 +307,27 @@ function Page({ params }: { params: { ContractAddress: string } }) {
                 alt="Player 1"
                 className="w-16 h-16 object-cover rounded-full"
               />
+              <div className="flex items-center space-x-2">
               <div>
                 <h2 className="text-xl font-bold text-gray-800">Player 1:</h2>
                 <h3 className="text-lg font-bold text-gray-800">
                   {`${player1[0].slice(0, 6)}...${player1[0].slice(-8)}`}
                 </h3>
               </div>
+              {address.address?.toLowerCase() === player1[0].toLowerCase() && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-green-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </div>
+
             </div>
   
             {/* Player 1 Info */}
@@ -204,12 +369,27 @@ function Page({ params }: { params: { ContractAddress: string } }) {
                 alt="Player 2"
                 className="w-16 h-16 object-cover rounded-full"
               />
+              <div className="flex items-center space-x-2">
               <div>
                 <h2 className="text-xl font-bold text-gray-800">Player 2:</h2>
                 <h3 className="text-lg font-bold text-gray-800">
                   {`${player2[0].slice(0, 6)}...${player2[0].slice(-8)}`}
                 </h3>
               </div>
+              {address.address?.toLowerCase() === player2[0].toLowerCase() && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-green-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </div>
+
             </div>
   
             {/* Player 2 Info */}
@@ -238,6 +418,10 @@ function Page({ params }: { params: { ContractAddress: string } }) {
         )}
       </div>
   
+
+
+
+
       {/* Commit or Reveal Stage */}
       {player1[1] === "0x0000000000000000000000000000000000000000000000000000000000000000" ||
       player2[1] === "0x0000000000000000000000000000000000000000000000000000000000000000" ? (
@@ -245,7 +429,7 @@ function Page({ params }: { params: { ContractAddress: string } }) {
       ) : (
         <div>
           {player2[2] !== 0 && player1[2] !== 0 ? (
-            renderWinnerInfo()
+            renderWinnerInfo(move)
           ) : (
           <RevealStage 
             contractAddress={ContractAddress} 
@@ -256,12 +440,15 @@ function Page({ params }: { params: { ContractAddress: string } }) {
           )}
         </div>
       )}
+
+
+      {/*}
        <p className="font-medium text-gray-600">
         Move: {move ? Moves[move] : "Waiting for move..."}
       </p>
       <p className="font-medium text-gray-600">
         Secret: {secret || "Waiting for secret..."}
-      </p>
+      </p>*/}
     </div>
   );
   

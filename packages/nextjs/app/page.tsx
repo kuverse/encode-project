@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import ContractData from "../public/Game.json";
 import DeployStage from "./_Components/DeployStage";
@@ -20,12 +19,13 @@ const RockPaperScissorsGame: React.FC = () => {
   const Router = useRouter();
   const client = usePublicClient();
   const isAddressValid = isAddress(inputAddress);
+
   
   useEffect(() => {
     const savedAddresses = JSON.parse(localStorage.getItem("gameAddresses") || "[]");
     setGameAddresses(savedAddresses);
   }, []);
-  
+
   const deployContract = async () => {
     if (!walletClient || !address) {
       alert("Please connect your wallet first!");
@@ -43,18 +43,19 @@ const RockPaperScissorsGame: React.FC = () => {
       const receipt = await client?.waitForTransactionReceipt({ hash: deploymentResult });
       const contractAdd = receipt?.contractAddress;
       if (contractAdd) {
-      alert(`Contract deployed at: ${contractAdd}`);
-      const updatedAddresses = [...gameAddresses, contractAdd];
-      setGameAddresses(updatedAddresses);
-      localStorage.setItem("gameAddresses", JSON.stringify(updatedAddresses));
+        alert(`Contract deployed at: ${contractAdd}`);
+        const updatedAddresses = [...gameAddresses, contractAdd];
+        setGameAddresses(updatedAddresses);
+        localStorage.setItem("gameAddresses", JSON.stringify(updatedAddresses));
 
-      Router.push(`/Game/${contractAdd}`);
-    }
+        Router.push(`/Game/${contractAdd}`);
+      }
     } catch (error) {
       console.error("Error deploying contract:", error);
       alert("Failed to deploy contract.");
     }
   };
+
   const handleNavigate = () => {
     if (inputAddress.trim() === "") {
       alert("Please enter a valid address!");
@@ -62,12 +63,11 @@ const RockPaperScissorsGame: React.FC = () => {
     }
     Router.push(`/Game/${inputAddress}`);
   };
+
   return (
     <div>
       <div className="flex justify-around lg:flex-nowrap flex-wrap">
-        
-
-      <DeployStage
+        <DeployStage
           rivalAddress={rivalAddress}
           setRivalAddress={setRivalAddress}
           betAmount={betAmount}
@@ -76,29 +76,51 @@ const RockPaperScissorsGame: React.FC = () => {
         />
 
         <h3 className="p-6">OR</h3>
-        <div className="w-200 h-55 p-6 bg-white rounded-lg shadow-md " style={{ width: "400px" }}>
+        <div
+          className="w-200 h-55 p-6 bg-white rounded-lg shadow-md"
+          style={{ width: "400px" }}
+        >
           <h4 className="text-l font-bold text-black">Already have a game started?</h4>
           <div className="w-70">
             <input
               type="text"
               value={inputAddress}
-              onChange={e => setInputAddress(e.target.value)}
+              onChange={(e) => setInputAddress(e.target.value)}
               placeholder="Enter Deployed Game Address"
-              className="mt-2 w-full p-2 border rounded text-white mb-4"
+              className="mt-2 w-full p-2 border rounded text-black mb-4"
             />
-            {!isAddressValid && inputAddress && <p className="text-red-500">Invalid Contract address</p>}
+            {!isAddressValid && inputAddress && (
+              <p className="text-red-500">Invalid Contract address</p>
+            )}
           </div>
 
           <button
             onClick={handleNavigate}
-            className={`w-full p-3 rounded ${isAddressValid ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400"}`}
+            className={`w-full p-3 rounded ${
+              isAddressValid ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400"
+            }`}
             disabled={!isAddressValid}
           >
             Go to Game
           </button>
         </div>
       </div>
-    
+
+      {/* Display the list of game addresses */}
+      <div className="mt-10">
+        <h3 className="text-lg font-bold text-center text-black mb-4">Deployed Game Addresses:</h3>
+        {gameAddresses.length > 0 ? (
+          <ul className="list-disc list-inside">
+            {gameAddresses.map((address, index) => (
+              <li key={index} className="text-black">
+                {address}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-center text-gray-500">No deployed game addresses yet.</p>
+        )}
+      </div>
     </div>
   );
 };

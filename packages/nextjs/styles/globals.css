@@ -42,3 +42,46 @@ p {
 .btn.btn-ghost {
   @apply shadow-none;
 }
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+.wiggle {
+  display: inline-block;
+  animation: wiggle 0.5s ease-in-out infinite;
+}
+/* Add this to your global CSS file */
+
+/* Shine effect */
+.shine-effect {
+  background: linear-gradient(90deg, #eefc1e, #d6ff21, #ffffff);
+  background-size: 200% auto;
+  animation: shine 2s linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* Wiggle animation */
+.wiggle {
+  animation: wiggle 1s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}

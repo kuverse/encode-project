@@ -11,7 +11,7 @@ const InfoPopup: React.FC = () => {
     <div className="relative flex items-center justify-center">
       <button
         onClick={() => setIsPopupVisible(!isPopupVisible)}
-        className="text-white text-2xl bg-blue-500 hover:bg-blue-600 p-2 rounded-full shadow-md focus:outline-none"
+        className="text-black text-2xl hover:bg-blue-600 p-2 rounded-full shadow-md focus:outline-none"
         aria-label="Info"
       >
         <AiOutlineInfoCircle />

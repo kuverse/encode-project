@@ -54,7 +54,7 @@ const CommitStage: React.FC<{
             </button>
           ))}
       </div>
-
+{/*}
       <div className="mb-4">
         <label className="block mb-2 font-medium text-black">Secret:</label>
         <input
@@ -87,6 +87,28 @@ const CommitStage: React.FC<{
       >
         Commit Move
       </button>
+*/}
+      <button
+        onClick={() => {
+          if (selectedMove !== null) {
+            const newSecret = generateRandomSecret(); // Generate the secret
+            setSecret(newSecret); // Update the state
+            onCommit(selectedMove, newSecret); // Use the generated secret to commit
+          }
+        }}
+        className="w-full bg-blue-500 text-white p-5 rounded hover:bg-blue-600"
+        disabled={
+          selectedMove === null ||
+          (address?.toLowerCase() != player1[0].toLowerCase() && address?.toLowerCase() != player2[0].toLowerCase()) ||
+          (address.toLowerCase() === player1[0].toLowerCase() &&
+            player1[1] !== "0x0000000000000000000000000000000000000000000000000000000000000000") ||
+          (address.toLowerCase() === player2[0].toLowerCase() &&
+            player2[1] !== "0x0000000000000000000000000000000000000000000000000000000000000000")
+        }
+      >
+        Chose Move
+      </button>
+
     </div>
   );
 };
