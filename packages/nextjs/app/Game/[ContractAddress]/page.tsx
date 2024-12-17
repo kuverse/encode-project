@@ -282,14 +282,18 @@ function Page({ params }: { params: { ContractAddress: string } }) {
         <p>Error fetching bet amount: {betError.message}</p>
       ) : (
         <div className="text-center flex items-center justify-center gap-2">
-        <p className="text-2xl p-2 bg-blue-400 font-bold inline-block text-center">
-          Prize Amount: {formatEther(betAmount as bigint)?.toString()} ETH
+       <p className="text-2xl p-2 font-bold inline-block text-center text-yellow-400">
+          Prize Amount:
         </p>
+        <p className="text-2xl p-2 font-bold inline-block text-center text-yellow-400">
+          {formatEther(betAmount as bigint)?.toString()} ETH
+        </p>
+
         <Image
-          src="/images/eth.png" // Replace with the actual path to your Ethereum logo
+          src="/images/gold-eth.png" // Replace with the actual path to your Ethereum logo
           alt="Ethereum"
-          width={20}
-          height={20}
+          width={40}
+          height={40}
           className="wiggle"
         />
       </div>
