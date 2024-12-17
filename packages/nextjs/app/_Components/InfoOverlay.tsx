@@ -31,13 +31,16 @@ const InfoPopup: React.FC = () => {
 
       {/* Content Container */}
       <div className="w-full flex flex-col items-center">
-        {/* Title */}
-        <h2 className="block font-medium text-black text-lg text-center mb-4">
-          Welcome to Rock, Paper, Scissors on the blockchain! This is the final project for the encode club EVM certification.
-        </h2>
-        <p>Due to the nature of the blockchain players must commit their moves before finally revealing them.</p>
+      <div className="text-center p-6">
+          <h1 className="text-3xl font-extrabold text-gray-900 mb-4">
+            Welcome to Rock, Paper, Scissors on the Blockchain!
+          </h1>
+          <p className="text-lg text-gray-700 leading-relaxed">
+            Due to the nature of the blockchain, players must commit their moves before revealing them.
+          </p>
+        </div>
 
-        {/* Image */}
+        <div className="text-center p-3">
         <Image
           src="/image.png"
           alt="Tutorial"
@@ -46,6 +49,10 @@ const InfoPopup: React.FC = () => {
           height={600}
           className="rounded-lg"
         />
+         <p className="text-lg text-gray-700 leading-relaxed">
+            A project for the Encode Club EVM certification.
+          </p>
+        </div>
       </div>
     </div>
   </div>
