@@ -154,15 +154,15 @@ function Page({ params }: { params: { ContractAddress: string } }) {
     if (winner === "0x0000000000000000000000000000000000000000") {
       return (
         <div className="text-center">
-          <p className="text-lg font-bold text-black">🤝 Its a Draw! Try again.</p>
+          <p className="text-lg font-bold text-black mt-10">🤝 Its a Draw! Try again.</p>
           <div className="flex justify-center items-center gap-4 mt-4">
             <div>
               <p className="font-medium text-gray-700">Your Move</p>
               <Image
                 src={moveImages[playerMove!]}
                 alt={Moves[playerMove!]}
-                width={50}
-                height={50}
+                width={100}
+                height={100}
                 className="wiggle"
               />
               <p>{Moves[playerMove!]}</p>
@@ -172,8 +172,8 @@ function Page({ params }: { params: { ContractAddress: string } }) {
               <Image
                 src={moveImages[playerMove!]}
                 alt={Moves[playerMove!]}
-                width={50}
-                height={50}
+                width={100}
+                height={100}
                 className="wiggle"
               />
               <p>{Moves[playerMove!]}</p>
@@ -290,8 +290,8 @@ function Page({ params }: { params: { ContractAddress: string } }) {
         <Image
           src="/images/white-eth2.png" // Replace with the actual path to your Ethereum logo
           alt="Ethereum"
-          width={35}
-          height={35}
+          width={30}
+          height={30}
           className="wiggle"
         />
       </div>

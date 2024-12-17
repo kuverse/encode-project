@@ -108,7 +108,7 @@ const CommitStage: React.FC<{
             player2[1] !== "0x0000000000000000000000000000000000000000000000000000000000000000")
         }
       >
-        Chose Move
+        Choose Move
       </button>
 
     </div>
