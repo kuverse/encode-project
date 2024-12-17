@@ -8,6 +8,7 @@ import CommitStage from "~~/app/_Components/CommitStage";
 import RevealStage from "~~/app/_Components/RevealStage";
 import Image from "next/image";
 import { useAccount } from "wagmi";
+import Confetti from "react-confetti";
 
 enum Moves {
   Rock = 1,
@@ -80,8 +81,7 @@ function Page({ params }: { params: { ContractAddress: string } }) {
   });
 
   const { data: forfeiter, isLoading: isForfeitLoading } = ForfeitQuery;
-  console.log(forfeiter);
-  
+  //console.log("forfeiter: ",forfeiter);
   const { data: State, isLoading: isStateLoading, isError: isStateError, error: StateError } = GameQuery;
 
   const { data: winner, isLoading: isWinnerLoading, isError: isWinnerError, error: winnerError } = winnerQuery;
@@ -122,7 +122,7 @@ function Page({ params }: { params: { ContractAddress: string } }) {
         args: [commitHash],
         value: betAmount as bigint,
       });
-      alert("Move committed successfully!");
+      //alert("Move committed successfully!");
     } catch (error) {
       console.error("Error committing move:", error);
       alert("Failed to commit move.");
@@ -137,6 +137,7 @@ function Page({ params }: { params: { ContractAddress: string } }) {
         functionName: "forfeit",
         args: [],
       });
+      alert("Forfeit transaction sent successfully!");
     } catch (error) {
       console.error("Error Surrendering:", error);
       alert("Failed to Surrender.");
@@ -188,10 +189,12 @@ function Page({ params }: { params: { ContractAddress: string } }) {
     typeof winner === "string" &&
     typeof address?.address === "string" &&
     address.address.toLowerCase().trim() === winner.toLowerCase().trim();  
-    // Calculate opponent's move based on the result
+    //console.log("winner:", isUserWinner);
+
     const calculateOpponentMove = (myMove: Moves, won: boolean): Moves => {
       if (won) {
-        // If the user won, the opponent had a move that loses to the player's move
+
+
         return myMove === Moves.Rock
           ? Moves.Scissors
           : myMove === Moves.Paper
@@ -212,6 +215,8 @@ function Page({ params }: { params: { ContractAddress: string } }) {
     return (
 
       <div className="text-center shadow-lg rounded-lg w-300 lg:w-1/2">
+      {isUserWinner && <Confetti width={500} height={1300} numberOfPieces={300} />}
+
         <p className="text-lg font-bold text-black mt-20">
           {isUserWinner ? "🎉 You Won! 🎉" : "😢 You Lost! 😢"}
         </p>
@@ -280,7 +285,7 @@ function Page({ params }: { params: { ContractAddress: string } }) {
       ) : (
         <div className="text-center flex items-center justify-center gap-2">
         <p className="text-2xl p-2 bg-blue-400 font-bold inline-block text-center">
-          Bet Amount: {formatEther(betAmount as bigint)?.toString()} ETH
+          Prize Amount: {formatEther(betAmount as bigint)?.toString()} ETH
         </p>
         <Image
           src="/images/eth.png" // Replace with the actual path to your Ethereum logo
@@ -317,6 +322,8 @@ function Page({ params }: { params: { ContractAddress: string } }) {
                 </h3>
               </div>
               {address.address?.toLowerCase() === player1[0].toLowerCase() && (
+                <>
+
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6 text-green-500"
@@ -327,6 +334,9 @@ function Page({ params }: { params: { ContractAddress: string } }) {
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
+                <h3 className="text-lg font-bold text-green-500">You</h3>
+
+                 </>
               )}
             </div>
 
@@ -379,6 +389,7 @@ function Page({ params }: { params: { ContractAddress: string } }) {
                 </h3>
               </div>
               {address.address?.toLowerCase() === player2[0].toLowerCase() && (
+                <>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-6 w-6 text-green-500"
@@ -389,6 +400,8 @@ function Page({ params }: { params: { ContractAddress: string } }) {
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
+                <h3 className="text-lg font-bold text-green-500">You</h3>
+                </>
               )}
             </div>
 
@@ -424,23 +437,16 @@ function Page({ params }: { params: { ContractAddress: string } }) {
 
 
 
-      {/* Commit or Reveal Stage */}
-      {player1[1] === "0x0000000000000000000000000000000000000000000000000000000000000000" ||
-      player2[1] === "0x0000000000000000000000000000000000000000000000000000000000000000" ? (
-        <CommitStage onCommit={commitMove} player1={player1} player2={player2} />
+      {isStateLoading ? (
+        <>State Loading...</>
+      ) : isStateError ? (
+        <>State Load Error</>
       ) : (
-        <div>
-          {player2[2] !== 0 && player1[2] !== 0 ? (
-            renderWinnerInfo(move)
-          ) : (
-          <RevealStage 
-            contractAddress={ContractAddress} 
-            move={move as Moves} 
-            secret={secret} 
-          />            
-             
-          )}
-        </div>
+        <>
+          {State == 0 && <CommitStage onCommit={commitMove} player1={player1} player2={player2} />}
+          {State == 1 && <RevealStage contractAddress={ContractAddress} move={move as Moves} secret={secret} surrender={surrender}  />}
+          {State == 2 && renderWinnerInfo(move)}
+        </>
       )}
 
 

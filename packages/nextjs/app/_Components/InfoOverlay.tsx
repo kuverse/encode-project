@@ -35,6 +35,7 @@ const InfoPopup: React.FC = () => {
         <h2 className="block font-medium text-black text-lg text-center mb-4">
           Welcome to Rock, Paper, Scissors on the blockchain! This is the final project for the encode club EVM certification.
         </h2>
+        <p>Due to the nature of the blockchain players must commit their moves before finally revealing them.</p>
 
         {/* Image */}
         <Image

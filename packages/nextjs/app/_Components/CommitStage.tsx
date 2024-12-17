@@ -93,8 +93,10 @@ const CommitStage: React.FC<{
           if (selectedMove !== null) {
             const newSecret = generateRandomSecret(); // Generate the secret
             setSecret(newSecret); // Update the state
-            onCommit(selectedMove, newSecret); // Use the generated secret to commit
-          }
+            onCommit(selectedMove, newSecret);
+            setTimeout(() => {
+              window.location.reload();
+            }, 5000);          }
         }}
         className="w-full bg-blue-500 text-white p-5 rounded hover:bg-blue-600"
         disabled={

@@ -15,14 +15,18 @@ const moveImages = {
   [Moves.Scissors]: "/images/scissors.png", // Replace with the actual path to your scissors image
 };
 
+
+
 function RevealStage({
   contractAddress,
   move,
   secret,
+  surrender
 }: {
   contractAddress: string;
   move: Moves;
   secret: string;
+  surrender: () => void 
 }) {
   const { writeContract } = useWriteContract();
 
@@ -40,7 +44,10 @@ function RevealStage({
         args: [move, secret],
       });
 
-      alert("Move revealed successfully!");
+      //alert("Move revealed successfully!");
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000); 
     } catch (error) {
       console.error("Error revealing move:", error);
       alert("Failed to reveal move.");
@@ -55,22 +62,24 @@ function RevealStage({
         <Image
           src={moveImages[move]}
           alt={Moves[move]}
-          width={50}
-          height={50}
+          width={100}
+          height={100}
           className="mb-2"
         />
         <p className="ml-2 font-medium text-gray-700">{Moves[move]}</p>
       </div>
 
 
-
-      {/* Reveal button */}
+      
       <button
         onClick={handleReveal}
         className="w-full py-5 bg-green-500 text-white rounded disabled:bg-gray-300"
       >
         Reveal Move
       </button>
+      <button className="mt-2 w-full py-5 bg-red-500 text-white rounded disabled:bg-gray-300" onClick={surrender}>
+            Forfeit
+          </button>
     </div>
   );
 }
