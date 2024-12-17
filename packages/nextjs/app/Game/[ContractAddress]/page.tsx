@@ -8,7 +8,6 @@ import CommitStage from "~~/app/_Components/CommitStage";
 import RevealStage from "~~/app/_Components/RevealStage";
 import Image from "next/image";
 import { useAccount } from "wagmi";
-import Confetti from "react-confetti";
 
 enum Moves {
   Rock = 1,
@@ -80,9 +79,9 @@ function Page({ params }: { params: { ContractAddress: string } }) {
     functionName: "surrender",
   });
 
-  const { data: forfeiter, isLoading: isForfeitLoading } = ForfeitQuery;
+  //const { data: forfeiter, isLoading: isForfeitLoading } = ForfeitQuery;
   //console.log("forfeiter: ",forfeiter);
-  const { data: State, isLoading: isStateLoading, isError: isStateError, error: StateError } = GameQuery;
+  const { data: State, isLoading: isStateLoading, isError: isStateError } = GameQuery;
 
   const { data: winner, isLoading: isWinnerLoading, isError: isWinnerError, error: winnerError } = winnerQuery;
   const { data: betAmount, isLoading: isBetLoading, isError: isBetError, error: betError } = betAmountQuery;
@@ -155,7 +154,7 @@ function Page({ params }: { params: { ContractAddress: string } }) {
     if (winner === "0x0000000000000000000000000000000000000000") {
       return (
         <div className="text-center">
-          <p className="text-lg font-bold text-black">🤝 It's a Draw! Try again.</p>
+          <p className="text-lg font-bold text-black">🤝 Its a Draw! Try again.</p>
           <div className="flex justify-center items-center gap-4 mt-4">
             <div>
               <p className="font-medium text-gray-700">Your Move</p>
@@ -169,7 +168,7 @@ function Page({ params }: { params: { ContractAddress: string } }) {
               <p>{Moves[playerMove!]}</p>
             </div>
             <div>
-              <p className="font-medium text-gray-700">Opponent's Move</p>
+              <p className="font-medium text-gray-700">Opponents Move</p>
               <Image
                 src={moveImages[playerMove!]}
                 alt={Moves[playerMove!]}
@@ -238,7 +237,7 @@ function Page({ params }: { params: { ContractAddress: string } }) {
             <p>{Moves[playerMove!]}</p>
           </div>
           <div>
-            <p className="font-medium text-gray-700">Opponent's Move</p>
+            <p className="font-medium text-gray-700">Opponents Move</p>
             <Image
               src={moveImages[opponentMove]}
               alt={Moves[opponentMove]}
