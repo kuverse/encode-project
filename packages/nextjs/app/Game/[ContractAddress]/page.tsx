@@ -261,8 +261,6 @@ function Page({ params }: { params: { ContractAddress: string } }) {
     );
   };
   
-  
-
 
   return (
     <div className="p-6 space-y-6 max-w-4xl mx-auto bg-white">
@@ -295,7 +293,6 @@ function Page({ params }: { params: { ContractAddress: string } }) {
           className="wiggle"
         />
       </div>
-
       )}
   
       {/* Player Cards */}
@@ -339,7 +336,6 @@ function Page({ params }: { params: { ContractAddress: string } }) {
                  </>
               )}
             </div>
-
             </div>
   
             {/* Player 1 Info */}
