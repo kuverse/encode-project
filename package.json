@@ -35,6 +35,8 @@
     "verify": "yarn workspace @se-2/hardhat verify"
   },
   "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "husky": "~8.0.3",
     "lint-staged": "~13.2.2"
   },
@@ -43,8 +45,14 @@
     "node": ">=18.18.0"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.62.7",
+    "@typescript-eslint/parser": "^8.18.1",
+    "postcss": "^8.4.49",
+    "react": "^19.0.0",
     "react-confetti": "^6.1.0",
+    "react-dom": "^19.0.0",
     "react-icons": "^5.4.0",
-    "wagmi": "^2.14.1"
+    "viem": "^2.21.55",
+    "wagmi": "^2.14.3"
   }
 }
