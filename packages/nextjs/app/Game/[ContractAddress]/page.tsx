@@ -215,7 +215,7 @@ function Page({ params }: { params: { ContractAddress: string } }) {
     return (
 
       <div className="text-center shadow-lg rounded-lg w-300 lg:w-1/2">
-      {isUserWinner && <Confetti width={500} height={1300} numberOfPieces={300} />}
+      {/*{isUserWinner && <Confetti width={500} height={1300} numberOfPieces={300} />}*/}
 
         <p className="text-lg font-bold text-black mt-20">
           {isUserWinner ? "🎉 You Won! 🎉" : "😢 You Lost! 😢"}
