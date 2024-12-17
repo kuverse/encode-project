@@ -10,8 +10,9 @@ This is the final project for the Encode Club EVM certification. Players commit 
 
 ## How it Works
 ![Workflow](packages/nextjs/public/screenshots/4.png)
+![Workflow](packages/nextjs/public/screenshots/5.png)
 ![Workflow](packages/nextjs/public/screenshots/2.png)
 ![Workflow](packages/nextjs/public/screenshots/3.png)
 
-![Workflow](packages/nextjs/public/screenshots/5.png)
+
 
